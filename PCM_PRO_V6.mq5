@@ -703,6 +703,7 @@ bool CalcularCanalPrimeirasVelas(datetime inicio, double &topo, double &fundo)
    if(total <= QuantidadeVelasCanal + 2) return false;
 
    datetime candleAtual = iTime(_Symbol, TF(), 0);
+   int periodoSegundos = PeriodSeconds(TF());
    int cont = 0;
    topo = -DBL_MAX;
    fundo = DBL_MAX;
@@ -710,7 +711,7 @@ bool CalcularCanalPrimeirasVelas(datetime inicio, double &topo, double &fundo)
    for(int shift = total - 1; shift >= 1; shift--)
      {
       datetime t = iTime(_Symbol, TF(), shift);
-      if(t < inicio)        continue;
+      if(t + periodoSegundos <= inicio) continue; // V7 FIX: inclui vela que atravessa inicio
       if(t >= candleAtual)  continue;
 
       if(VelaGrandeParaCanal(shift))
@@ -764,13 +765,14 @@ bool CalcularCanalAposHorario(datetime inicio, double &topo, double &fundo)
    int total = iBars(_Symbol, TF());
    if(total <= QuantidadeVelasCanal + 2) return false;
    datetime candleAtual = iTime(_Symbol, TF(), 0);
+   int periodoSegundos = PeriodSeconds(TF());
    int cont = 0;
    topo = -DBL_MAX;
    fundo = DBL_MAX;
    for(int shift = total - 1; shift >= 1; shift--)
      {
       datetime t = iTime(_Symbol, TF(), shift);
-      if(ConsiderarVelaFechamentoNaRecriacao) { if(t < inicio) continue; }
+      if(ConsiderarVelaFechamentoNaRecriacao) { if(t + periodoSegundos <= inicio) continue; } // V7 FIX
       else                                    { if(t <= inicio) continue; }
       if(t >= candleAtual) continue;
       double o = iOpen(_Symbol, TF(), shift);
@@ -799,6 +801,7 @@ bool CalcularCanalExpansivoAposHorario(datetime inicio, bool incluirVelaInicio,
    int limiteVelas = QuantidadeVelasCanal;
    if(ExpandirCanalAteMinimoPontos)
       limiteVelas = MathMax(QuantidadeVelasCanal, MaximoVelasParaExpandirCanal);
+   int periodoSegundos = PeriodSeconds(TF());
 
    if(UsarCorpoRealSemPavio)
      {
@@ -808,7 +811,7 @@ bool CalcularCanalExpansivoAposHorario(datetime inicio, bool incluirVelaInicio,
       for(int shift = total - 1; shift >= 1; shift--)
         {
          datetime t = iTime(_Symbol, TF(), shift);
-         if(incluirVelaInicio) { if(t < inicio) continue; }
+         if(incluirVelaInicio) { if(t + periodoSegundos <= inicio) continue; } // V7 FIX
          else                  { if(t <= inicio) continue; }
          if(t >= candleAtual) continue;
          if(VelaGrandeParaCanal(shift))
@@ -840,7 +843,7 @@ bool CalcularCanalExpansivoAposHorario(datetime inicio, bool incluirVelaInicio,
       for(int shift = total - 1; shift >= 1; shift--)
         {
          datetime t = iTime(_Symbol, TF(), shift);
-         if(incluirVelaInicio) { if(t < inicio) continue; }
+         if(incluirVelaInicio) { if(t + periodoSegundos <= inicio) continue; } // V7 FIX
          else                  { if(t <= inicio) continue; }
          if(t >= candleAtual) continue;
          if(VelaGrandeParaCanal(shift))
@@ -875,7 +878,7 @@ bool CalcularCanalExpansivoAposHorario(datetime inicio, bool incluirVelaInicio,
    for(int shift = total - 1; shift >= 1; shift--)
      {
       datetime t = iTime(_Symbol, TF(), shift);
-      if(incluirVelaInicio) { if(t < inicio) continue; }
+      if(incluirVelaInicio) { if(t + periodoSegundos <= inicio) continue; } // V7 FIX
       else                  { if(t <= inicio) continue; }
       if(t >= candleAtual) continue;
       if(VelaGrandeParaCanal(shift))
@@ -911,13 +914,14 @@ double CalcularTamanhoCorpoPrimeirasVelasApos(datetime inicio)
    int total = iBars(_Symbol, TF());
    if(total <= QuantidadeVelasCanal + 2) return 0.0;
    datetime candleAtual = iTime(_Symbol, TF(), 0);
+   int periodoSegundos = PeriodSeconds(TF());
    int cont = 0;
    double topoCorpo = -DBL_MAX;
    double fundoCorpo = DBL_MAX;
    for(int shift = total - 1; shift >= 1; shift--)
      {
       datetime t = iTime(_Symbol, TF(), shift);
-      if(t < inicio)       continue;
+      if(t + periodoSegundos <= inicio) continue; // V7 FIX
       if(t >= candleAtual) continue;
       if(VelaGrandeParaCanal(shift))
         { cont=0; topoCorpo=-DBL_MAX; fundoCorpo=DBL_MAX; continue; }
